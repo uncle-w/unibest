@@ -327,7 +327,7 @@ export async function injectUcharts(
     'src/components/qiun-loading/loading5.vue',
     'src/components/qiun-loading/qiun-loading.vue',
     'src/components/qiun-title-bar/qiun-title-bar.vue',
-    'src/pages-demo/ucharts.vue',
+    'src/pages-demo/ucharts/index.vue',
     'src/pages-demo/ucharts/data.json',
   ]
 
