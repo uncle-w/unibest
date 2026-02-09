@@ -292,7 +292,7 @@ export async function injectLimeEchart(
     'src/uni_modules/lime-echart/components/l-echart/l-echart.vue',
     'src/uni_modules/lime-echart/components/l-echart/canvas.js',
     'src/uni_modules/lime-echart/components/l-echart/l-echart.uvue',
-    'src/hooks/useEcharts.ts',
+    'src/pages-demo/hooks/useEcharts.ts',
     'src/pages-demo/lime-echarts/index.vue',
     'src/pages-demo/lime-echarts/index2.vue',
     'src/pages-demo/lime-echarts/index2.ts',
