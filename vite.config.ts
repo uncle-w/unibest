@@ -1,6 +1,7 @@
 import path from 'node:path'
 import process from 'node:process'
 import Uni from '@uni-helper/plugin-uni'
+import { isMpWeixin } from '@uni-helper/uni-env'
 import UniComponents from '@uni-helper/vite-plugin-uni-components'
 // @see https://uni-helper.js.org/vite-plugin-uni-layouts
 import UniLayouts from '@uni-helper/vite-plugin-uni-layouts'
@@ -11,6 +12,7 @@ import UniPages from '@uni-helper/vite-plugin-uni-pages'
 // @see https://github.com/uni-helper/vite-plugin-uni-platform
 // 需要与 @uni-helper/vite-plugin-uni-pages 插件一起使用
 import UniPlatform from '@uni-helper/vite-plugin-uni-platform'
+
 /**
  * 分包优化、模块异步跨包调用、组件异步跨包引用
  * @see https://github.com/uni-ku/bundle-optimizer
@@ -85,11 +87,7 @@ export default defineConfig(({ command, mode }) => {
       }),
       // UniOptimization 插件需要 page.json 文件，故应在 UniPages 插件之后执行
       UniOptimization({
-        enable: {
-          'optimization': true,
-          'async-import': true,
-          'async-component': true,
-        },
+        enable: isMpWeixin,
         dts: {
           base: 'src/types',
         },

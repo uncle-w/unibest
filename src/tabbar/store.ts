@@ -34,11 +34,11 @@ export function isPageTabbar(path: string) {
   if (selectedTabbarStrategy === TABBAR_STRATEGY_MAP.NO_TABBAR) {
     return false
   }
-  const _path = path.split('?')[0]
+  const _path = normalizeRoutePath(path)
   return _path === '/' || tabbarList.value.some(item => item.pagePath === _path)
 }
 
-function normalizeRoutePath(path?: string) {
+export function normalizeRoutePath(path?: string) {
   if (!path) {
     return ''
   }
@@ -50,6 +50,25 @@ function getCurrentPagePath() {
   const pages = getCurrentPages()
   const currentPage = pages[pages.length - 1]
   return normalizeRoutePath(currentPage?.route)
+}
+
+function findTabbarIndexByPath(path?: string) {
+  const normalizedPath = normalizeRoutePath(path)
+  if (normalizedPath === '/') {
+    return 0
+  }
+  return tabbarList.value.findIndex(item => item.pagePath === normalizedPath)
+}
+
+function findLatestTabbarIndexInPageStack() {
+  const pagesPathList = getCurrentPages().map(item => normalizeRoutePath(item.route))
+  for (let i = pagesPathList.length - 1; i >= 0; i -= 1) {
+    const index = findTabbarIndexByPath(pagesPathList[i])
+    if (index >= 0) {
+      return index
+    }
+  }
+  return -1
 }
 
 /**
@@ -76,25 +95,21 @@ const tabbarStore = reactive({
       this.setCurIdx(0)
       return
     }
-    const normalizedPath = normalizeRoutePath(path)
-    // '/' 当做首页
-    if (normalizedPath === '/') {
-      this.setCurIdx(0)
+
+    const index = findTabbarIndexByPath(path)
+    if (index >= 0) {
+      this.setCurIdx(index)
       return
     }
-    const index = list.findIndex(item => item.pagePath === normalizedPath)
-    // console.log('tabbarList:', tabbarList)
-    if (index === -1) {
-      const pagesPathList = getCurrentPages().map(item => normalizeRoutePath(item.route))
-      // console.log(pagesPathList)
-      const flag = list.some(item => pagesPathList.includes(item.pagePath))
-      if (!flag) {
-        this.setCurIdx(0)
-        return
-      }
+
+    const latestTabbarIndex = findLatestTabbarIndexInPageStack()
+    if (latestTabbarIndex >= 0) {
+      this.setCurIdx(latestTabbarIndex)
+      return
     }
-    else {
-      this.setCurIdx(index)
+
+    if (this.curIdx < 0 || this.curIdx >= list.length) {
+      this.setCurIdx(0)
     }
   },
   syncCurIdxByCurrentPage() {
@@ -102,6 +117,18 @@ const tabbarStore = reactive({
     if (currentPath) {
       this.setAutoCurIdx(currentPath)
     }
+  },
+  syncCurIdxByCurrentPageAsync() {
+    setTimeout(() => {
+      this.syncCurIdxByCurrentPage()
+    }, 0)
+  },
+  isCurrentRouteTabbarItem(index: number) {
+    const item = tabbarList.value[index]
+    if (!item) {
+      return false
+    }
+    return findTabbarIndexByPath(getCurrentPagePath()) === index
   },
   restorePrevIdx() {
     if (this.prevIdx === this.curIdx)
