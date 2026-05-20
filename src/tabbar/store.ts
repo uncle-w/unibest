@@ -60,17 +60,6 @@ function findTabbarIndexByPath(path?: string) {
   return tabbarList.value.findIndex(item => item.pagePath === normalizedPath)
 }
 
-function findLatestTabbarIndexInPageStack() {
-  const pagesPathList = getCurrentPages().map(item => normalizeRoutePath(item.route))
-  for (let i = pagesPathList.length - 1; i >= 0; i -= 1) {
-    const index = findTabbarIndexByPath(pagesPathList[i])
-    if (index >= 0) {
-      return index
-    }
-  }
-  return -1
-}
-
 /**
  * 自定义 tabbar 的状态管理，原生 tabbar 无需关注本文件
  * tabbar 状态，增加 storageSync 保证刷新浏览器时在正确的 tabbar 页面
@@ -99,12 +88,6 @@ const tabbarStore = reactive({
     const index = findTabbarIndexByPath(path)
     if (index >= 0) {
       this.setCurIdx(index)
-      return
-    }
-
-    const latestTabbarIndex = findLatestTabbarIndexInPageStack()
-    if (latestTabbarIndex >= 0) {
-      this.setCurIdx(latestTabbarIndex)
       return
     }
 
